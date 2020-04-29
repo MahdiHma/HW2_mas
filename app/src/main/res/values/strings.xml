@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HW2_mas</string>
+    <string name="app_description">this app lock your screen when you put it upward</string>
 </resources>
