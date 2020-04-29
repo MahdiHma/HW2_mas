@@ -32,6 +32,8 @@
             android:layout_gravity="center"
             android:text="Lock Screen"
             android:onClick="lockPhone"/>
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
