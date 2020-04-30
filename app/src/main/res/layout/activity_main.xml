@@ -18,20 +18,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Switch
-            android:id="@+id/sw_enable_lock"
+            android:id="@+id/sw_enable_lock_access"
             android:layout_width="match_parent"
             android:layout_marginRight="20dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Enable Lock Access" />
-
-        <Button
-            android:id="@+id/btn_lock"
-            android:layout_width="wrap_content"
+        <Switch
+            android:id="@+id/sw_enable_lock_service"
+            android:layout_width="match_parent"
+            android:layout_marginRight="20dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Lock Screen"
-            android:onClick="lockPhone"/>
+            android:layout_weight="1"
+            android:text="Enable Lock Service" />
 
 
     </LinearLayout>
