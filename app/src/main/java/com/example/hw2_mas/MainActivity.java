@@ -9,16 +9,22 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity {
     private Switch swEnableLock;
     private Switch swLockService;
+    private LinearLayout llLockService;
+    private TextView etAngle;
     static final int RESULT_ENABLE = 1;
     DevicePolicyManager deviceManger;
     ComponentName compName;
@@ -27,19 +33,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("created","act");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         swEnableLock = findViewById(R.id.sw_enable_lock_access);
         swLockService = findViewById(R.id.sw_enable_lock_service);
-        serviceIntent = new Intent(this, FlatDetectorService.class);
+        llLockService = findViewById(R.id.ll_lockService);
+        etAngle = findViewById(R.id.et_angle);
         deviceManger = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        serviceIntent = new Intent(this, FlatDetectorService.class);
         compName = new ComponentName(this, DeviceAdmin.class);
         boolean active = deviceManger.isAdminActive(compName);
         swEnableLock.setChecked(active);
         if (active) {
-            swLockService.setVisibility(View.VISIBLE);
+            llLockService.setVisibility(View.VISIBLE);
         } else {
-            swLockService.setVisibility(View.GONE);
+            llLockService.setVisibility(View.GONE);
         }
 
         swEnableLock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -52,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "You should enable the app!");
                     startActivityForResult(intent, RESULT_ENABLE);
                 } else if (active) {
+                    stopService(serviceIntent);
                     deviceManger.removeActiveAdmin(compName);
                     swLockService.setChecked(false);
-                    swLockService.setVisibility(View.GONE);
-                    stopService(serviceIntent);
+                    llLockService.setVisibility(View.GONE);
                 }
             }
         });
@@ -64,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.i("sw_lock","changed"+isChecked);
                 if (isChecked) {
+                    if(!TextUtils.isEmpty(etAngle.getText())){
+                        int lockAngle = Integer.parseInt(etAngle.getText().toString());
+                        serviceIntent.putExtra("lockAngle",lockAngle);
+                    }
                     startService(serviceIntent);
                 }
                 else{
@@ -72,16 +85,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Log.i("main Activity", "done");
-
-//        Intent intent = new Intent(this, FlatDetectorService.class);
-//        startService(intent);
     }
 
-//
-//    public void lockPhone(View view) {
-//        Intent intent = new Intent(this, FlatDetectorService.class);
-//        startService(intent);
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case RESULT_ENABLE:
                 if (resultCode == Activity.RESULT_OK) {
-                    swLockService.setVisibility(View.VISIBLE);
+                    llLockService.setVisibility(View.VISIBLE);
                 } else {
                     swEnableLock.setChecked(false);
                     Toast.makeText(getApplicationContext(), "Failed!",

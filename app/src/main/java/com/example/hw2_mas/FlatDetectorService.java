@@ -2,6 +2,7 @@ package com.example.hw2_mas;
 
 import android.app.IntentService;
 import android.app.Service;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -18,20 +19,21 @@ import androidx.annotation.Nullable;
 public class FlatDetectorService extends Service implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor gravitySensor;
-
-
+    private int lockAngle;
+    private DevicePolicyManager deviceManger;
     public void onCreate() {
         Log.i("service ", "started");
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        deviceManger = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         if (gravitySensor == null) {
             //todo handle
         }
     }
 
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-
-        Log.i("service", "start command started");
+        lockAngle = intent.getIntExtra("lockAngle",25);
+        Log.i("service", "start command started"+lockAngle);
         sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL);
         int i = 0;
 //        try {
@@ -62,8 +64,8 @@ public class FlatDetectorService extends Service implements SensorEventListener 
         z = (z / norm_Of_g);
         int inclination = (int) Math.round(Math.toDegrees(Math.acos(z)));
         Log.i("tag", "incline is:" + inclination);
-        if (inclination < 25 || inclination > 155) {
-//            lockPhone();
+        if (inclination < lockAngle || inclination > 180-lockAngle) {
+            deviceManger.lockNow();
             Toast.makeText(this, "device flat - beep!", Toast.LENGTH_SHORT).show();
         }
     }
