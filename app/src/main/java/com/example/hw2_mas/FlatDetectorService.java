@@ -1,56 +1,56 @@
 package com.example.hw2_mas;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 
-
-
-public class FlatDetectorService extends IntentService implements SensorEventListener {
+public class FlatDetectorService extends Service implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor gravitySensor;
 
 
-    public FlatDetectorService() {
-        super("FlatDetectorService");
-    }
-
-    @Override
     public void onCreate() {
-        super.onCreate();
-    }
-
-    @Override
-    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        Log.i("service ","started");
+        Log.i("service ", "started");
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
         if (gravitySensor == null) {
             //todo handle
         }
-        return super.onStartCommand(intent, flags, startId);
+    }
+
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+
+        Log.i("service", "start command started");
+        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        int i = 0;
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        Log.i("service", "start command ended");
+        return START_STICKY;
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        Log.i("service", "handle intent started");
-        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        int i = 0;
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.i("service","handle intent ended");
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    public void onDestroy() {
+        Log.i("service ", "destroyed");
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -68,12 +68,6 @@ public class FlatDetectorService extends IntentService implements SensorEventLis
         }
     }
 
-    @Override
-    public void onDestroy() {
-        Log.i("service ", "destroyed");
-        sensorManager.unregisterListener(this);
-        super.onDestroy();
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
