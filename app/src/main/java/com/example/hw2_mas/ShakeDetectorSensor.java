@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.widget.Toast;
 
 public class ShakeDetectorSensor implements SensorEventListener {
@@ -16,7 +17,6 @@ public class ShakeDetectorSensor implements SensorEventListener {
     private SensorManager shakeManager;
     private Context context;
     private Sensor shakeSensor;
-    private float threshold = 25;
     private float currentAcceleration;
     private float lastAcceleration;
 
@@ -34,7 +34,9 @@ public class ShakeDetectorSensor implements SensorEventListener {
         float x = sensorEvent.values[0];
         float y = sensorEvent.values[1];
         float z = sensorEvent.values[2];
+        Log.d("dd" , accelerationReport());
         currentAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
+        float threshold = 20f;
         if (currentAcceleration - lastAcceleration > threshold) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -75,7 +77,7 @@ public class ShakeDetectorSensor implements SensorEventListener {
         assert powerManager != null;
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
                 PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE,"appname::WakeLock");
-        wakeLock.acquire(5000 /*10 minutes*/);
+        wakeLock.acquire();
         wakeLock.release();
     }
 }
