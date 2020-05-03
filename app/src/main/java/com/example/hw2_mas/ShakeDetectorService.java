@@ -17,27 +17,21 @@ import androidx.annotation.Nullable;
 import java.util.Objects;
 
 public class ShakeDetectorService extends Service{
+    private ShakeDetectorSensor shakeDetectorSensor;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-
-        return Service.START_STICKY;
+        shakeDetectorSensor.startListening();
+        return Service.START_NOT_STICKY;
     }
     @Override
     public void onDestroy(){
-
+        super.onDestroy();
+        shakeDetectorSensor.stopListening();
     }
     @Override
     public void onCreate(){
-        Sensor accelerometer;
-        Context context = getBaseContext();
-        SensorManager shakeManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (shakeManager != null) {
-            accelerometer = shakeManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        } else {
-            Toast.makeText(context, "accelerometer not found", Toast.LENGTH_SHORT).show();
-        }
-
-
+        super.onCreate();
+        shakeDetectorSensor = new ShakeDetectorSensor(this);
     }
 
     @Nullable
