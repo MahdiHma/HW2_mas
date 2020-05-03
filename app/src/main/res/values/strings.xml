@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">HW2_mas</string>
     <string name="app_description">this app lock your screen when you put it upward</string>
+    <string name="enable_shake_unlock_access">Enable Shake Unlock access</string>
+    <string name="enable_lock_access">Enable Lock Access</string>
+    <string name="enable_lock_service">Enable Lock Service</string>
+    <string name="enter_lock_angle">enter lock angle</string>
 </resources>
