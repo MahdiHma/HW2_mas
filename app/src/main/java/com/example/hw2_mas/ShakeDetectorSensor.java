@@ -19,7 +19,8 @@ public class ShakeDetectorSensor implements SensorEventListener {
     private Sensor shakeSensor;
     private float currentAcceleration;
     private float lastAcceleration;
-
+    public static float TRESHLD_DEFALUT = 5f;
+    private float threshold;
 
     public ShakeDetectorSensor(Context context) {
         this.context = context;
@@ -34,10 +35,9 @@ public class ShakeDetectorSensor implements SensorEventListener {
         float x = sensorEvent.values[0];
         float y = sensorEvent.values[1];
         float z = sensorEvent.values[2];
-        Log.d("dd" , accelerationReport());
         currentAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
-        float threshold = 20f;
         if (currentAcceleration - lastAcceleration > threshold) {
+            Log.i("TAG", "onSensorChanged:tresh "+threshold);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
@@ -79,5 +79,9 @@ public class ShakeDetectorSensor implements SensorEventListener {
                 PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE,"appname::WakeLock");
         wakeLock.acquire();
         wakeLock.release();
+    }
+
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
     }
 }

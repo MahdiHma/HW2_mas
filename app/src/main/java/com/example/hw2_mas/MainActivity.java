@@ -12,16 +12,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.Serializable;
-import java.util.EventListener;
 
 public class MainActivity extends AppCompatActivity {
     private Switch swEnableLock;
@@ -31,14 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout llLockService;
 
     private TextView etAngle;
-
+    private TextView etShakeThreshold;
     static final int RESULT_ENABLE = 1;
 
     DevicePolicyManager deviceManger;
 
     ComponentName compName;
 
-    private Intent serviceIntent;
+    private Intent FlatDetectorIntent;
     private Intent shakeDetectorIntent;
 
     @Override
@@ -50,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
         swEnableLock = findViewById(R.id.sw_enable_lock_access);
         swLockService = findViewById(R.id.sw_enable_lock_service);
         llLockService = findViewById(R.id.ll_lockService);
+        etShakeThreshold = findViewById(R.id.et_shake_thresh);
         etAngle = findViewById(R.id.et_angle);
         deviceManger = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        serviceIntent = new Intent(this, FlatDetectorService.class);
+        FlatDetectorIntent = new Intent(this, FlatDetectorService.class);
         shakeDetectorIntent = new Intent(this, ShakeDetectorService.class);
         compName = new ComponentName(this, DeviceAdmin.class);
         boolean active = deviceManger.isAdminActive(compName);
@@ -69,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
+                    if (!TextUtils.isEmpty(etShakeThreshold.getText())){
+                        float shakeTs = Float.parseFloat(etShakeThreshold.getText().toString());
+                        shakeDetectorIntent.putExtra("shakeTs",shakeTs);
+                    }
                     startService(shakeDetectorIntent);
                     Log.i("sssssss","sssss");
 //                    Toast.makeText(, "ssssssss", Toast.LENGTH_LONG).show();
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (active) {
                     stopService(shakeDetectorIntent);
 
-                    stopService(serviceIntent);
+                    stopService(FlatDetectorIntent);
                     deviceManger.removeActiveAdmin(compName);
                     swLockService.setChecked(false);
                     llLockService.setVisibility(View.GONE);
@@ -106,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
                 if (isChecked) {
                     if (!TextUtils.isEmpty(etAngle.getText())) {
                         int lockAngle = Integer.parseInt(etAngle.getText().toString());
-                        serviceIntent.putExtra("lockAngle", lockAngle);
+                        FlatDetectorIntent.putExtra("lockAngle", lockAngle);
                     }
-                    startService(serviceIntent);
+                    startService(FlatDetectorIntent);
                 } else {
-                    stopService(serviceIntent);
+                    stopService(FlatDetectorIntent);
                 }
             }
         });

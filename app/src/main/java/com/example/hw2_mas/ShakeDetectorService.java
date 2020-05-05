@@ -17,10 +17,15 @@ import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
+import static android.content.ContentValues.TAG;
+
 public class ShakeDetectorService extends Service{
+    private float treshold;
     private ShakeDetectorSensor shakeDetectorSensor;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
+        treshold = intent.getFloatExtra("shakeTs",ShakeDetectorSensor.TRESHLD_DEFALUT);
+        shakeDetectorSensor.setThreshold(treshold);
         shakeDetectorSensor.startListening();
         Log.i("dd" , "start");
         return Service.START_NOT_STICKY;
@@ -37,7 +42,6 @@ public class ShakeDetectorService extends Service{
     public void onCreate(){
         super.onCreate();
         Log.i("dd" , "create");
-
         shakeDetectorSensor = new ShakeDetectorSensor(this);
     }
 

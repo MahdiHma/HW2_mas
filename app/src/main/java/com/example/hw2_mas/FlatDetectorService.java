@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 
 public class FlatDetectorService extends Service implements SensorEventListener {
+    private static int defalutAngleLock = 15;
     private SensorManager sensorManager;
     private Sensor gravitySensor;
     private int lockAngle;
@@ -32,7 +33,7 @@ public class FlatDetectorService extends Service implements SensorEventListener 
     }
 
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        lockAngle = intent.getIntExtra("lockAngle",25);
+        lockAngle = intent.getIntExtra("lockAngle",defalutAngleLock);
         Log.i("service", "start command started"+lockAngle);
         sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL);
         int i = 0;
